@@ -1,7 +1,7 @@
 package com.detective.validation;
 
-import com.detective.models.Code;
 import com.detective.exceptions.InvalidCodeException;
+import com.detective.models.Code;
 
 public class CodeValidator {
     public void validate(Code code) {
