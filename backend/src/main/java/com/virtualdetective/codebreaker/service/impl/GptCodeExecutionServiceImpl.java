@@ -3,7 +3,6 @@ package com.virtualdetective.codebreaker.service.impl;
 import com.virtualdetective.codebreaker.dto.CodeExecutionRequest;
 import com.virtualdetective.codebreaker.dto.CodeExecutionResponse;
 import com.virtualdetective.codebreaker.service.GptCodeExecutionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class GptCodeExecutionServiceImpl implements GptCodeExecutionService {
 
     private final RestTemplate restTemplate;
@@ -27,6 +25,10 @@ public class GptCodeExecutionServiceImpl implements GptCodeExecutionService {
 
     @Value("${openai.api.url}")
     private String apiUrl;
+
+    public GptCodeExecutionServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public CodeExecutionResponse executeCode(CodeExecutionRequest request) {
@@ -120,15 +122,8 @@ public class GptCodeExecutionServiceImpl implements GptCodeExecutionService {
         // Parse the GPT response and extract relevant information
         // This is a simplified implementation - you might want to make it more robust
         List<CodeExecutionResponse.TestCaseResult> testResults = new ArrayList<>();
-        
         // Extract test results from GPT response
         // This is where you'd parse the GPT response to get actual test results
-        
-        return CodeExecutionResponse.builder()
-                .success(true) // You'd determine this based on the GPT response
-                .output(gptResponse)
-                .testResults(testResults)
-                .explanation("Solution validated by GPT-4")
-                .build();
+        return new CodeExecutionResponse(gptResponse, null, testResults);
     }
-} 
+}

@@ -7,7 +7,6 @@ import com.virtualdetective.codebreaker.model.User;
 import com.virtualdetective.codebreaker.repository.UserRepository;
 import com.virtualdetective.codebreaker.security.JwtTokenProvider;
 import com.virtualdetective.codebreaker.service.AuthService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,13 +15,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+
+    // Removed Lombok @RequiredArgsConstructor
+    // Add explicit constructor for required fields
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationManager = authenticationManager;
+    }
 
     @Override
     @Transactional
@@ -39,18 +46,12 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName());
 
         user = userRepository.save(user);
         String token = jwtTokenProvider.generateToken(user);
 
-        return AuthResponse.builder()
-                .token(token)
-                .user(AuthResponse.UserDto.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .build())
-                .build();
+        return new AuthResponse(token, user);
     }
 
     @Override
@@ -62,13 +63,6 @@ public class AuthServiceImpl implements AuthService {
         User user = (User) authentication.getPrincipal();
         String token = jwtTokenProvider.generateToken(user);
 
-        return AuthResponse.builder()
-                .token(token)
-                .user(AuthResponse.UserDto.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .build())
-                .build();
+        return new AuthResponse(token, user);
     }
-} 
+}

@@ -4,17 +4,21 @@ import com.virtualdetective.codebreaker.dto.CodeExecutionRequest;
 import com.virtualdetective.codebreaker.dto.CodeExecutionResponse;
 import com.virtualdetective.codebreaker.service.GptCodeExecutionService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/code")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 public class CodeExecutionController {
 
     private final GptCodeExecutionService gptCodeExecutionService;
+
+    // Removed Lombok @RequiredArgsConstructor
+    // Add explicit constructor for required fields
+    public CodeExecutionController(GptCodeExecutionService gptCodeExecutionService) {
+        this.gptCodeExecutionService = gptCodeExecutionService;
+    }
 
     @PostMapping("/execute")
     public ResponseEntity<CodeExecutionResponse> executeCode(@Valid @RequestBody CodeExecutionRequest request) {
@@ -35,4 +39,4 @@ public class CodeExecutionController {
             @RequestParam String language) {
         return ResponseEntity.ok(gptCodeExecutionService.validateSolution(code, testCases, language));
     }
-} 
+}
